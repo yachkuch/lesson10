@@ -40,3 +40,4 @@ if(MINGW)
 endif()
 target_link_libraries(asio_client ${Boost_LIBRARIES})
 target_link_libraries(asio_server ${Boost_LIBRARIES})
+

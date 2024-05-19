@@ -35,7 +35,7 @@ void DataBaseWorker::add_mes( sqlite3_stmt  *stmt,std::string db_name,
   char* errmsg{};
   std::string sql{"INSERT INTO "};
   sql.append(db_name);
-  sql.append(" VALUE (");
+  sql.append(" VALUES (");
   sql.append(mes[1]);
   sql.append(", ");
   sql.append(mes[2]);

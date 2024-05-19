@@ -3,7 +3,7 @@
 #include <process.h>
 int main() 
 {
-    Networker net(1500);
+    Networker net(1337,"127.0.0.1");
     DataBaseWorker dbw;
     net.sig.connect(dbw);
     dbw.start_db();
