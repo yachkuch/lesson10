@@ -16,9 +16,9 @@ void DataBaseWorker::operator()(std::string data)
   std::cout<<data<<std::endl;
   std::vector<std::string> lines;
   boost::split(lines, data, boost::algorithm::is_space());
-  if(!lines.empty() && (lines.size() == 3))
+  if(!lines.empty() && (lines.size() == 4))
   {
-    auto val = lines.front();
+    auto val = lines.at(1);
     if(val == "A")
     {
       add_mes(create_table_stmt,"A",lines);
@@ -33,17 +33,19 @@ void DataBaseWorker::operator()(std::string data)
 void DataBaseWorker::add_mes( sqlite3_stmt  *stmt,std::string db_name,
  const std::vector<std::string>&mes)
 {
+  sqlite_check(sqlite3_open("db", &db));
   char* errmsg{};
-  std::string sql{"INSERT INTO "};
+  std::string sql{mes.at(0)};
+  sql.append(" INTO ");
   sql.append(db_name);
   sql.append(" VALUES (");
-  sql.append(mes[1]);
-  sql.append(", ");
   sql.append(mes[2]);
-  sql.append(");");
+  sql.append(", '");
+  sql.append(mes[3]);
+  sql.append("');");
   int res = sqlite3_exec(db, sql.data(),
                      nullptr, nullptr, &errmsg);
-  //sqlite_check(res, errmsg);
+  sqlite_check(res, errmsg);
 }
 
 int DataBaseWorker::sqlite_check(int code, const char *msg, int expected)
@@ -96,7 +98,7 @@ void DataBaseWorker::start_db()
 
     sqlite_check(sqlite3_finalize(create_table_stmt));
   }
-
+  char* errmsg{};
   std::string_view sqlb{"CREATE TABLE IF NOT EXISTS B"
                         "(id INTEGER PRIMARY KEY,"
                         "name VARCHAR(255) NOT NULL);"};
