@@ -1,5 +1,5 @@
 #include "DataBaseWorker.h"
-#include <format>
+//#include <format>
 #include <iostream>
 #include <boost/algorithm/string.hpp>
 
@@ -13,6 +13,7 @@ DataBaseWorker::~DataBaseWorker()
 
 void DataBaseWorker::operator()(std::string data) 
 {
+  std::cout<<data<<std::endl;
   std::vector<std::string> lines;
   boost::split(lines, data, boost::algorithm::is_space());
   if(!lines.empty() && (lines.size() == 3))
@@ -24,7 +25,7 @@ void DataBaseWorker::operator()(std::string data)
     }
     else if(val == "B")
     {
-
+      add_mes();
     }
   }
 }
@@ -42,7 +43,7 @@ void DataBaseWorker::add_mes( sqlite3_stmt  *stmt,std::string db_name,
   sql.append(");");
   int res = sqlite3_exec(db, sql.data(),
                      nullptr, nullptr, &errmsg);
-  sqlite_check(res, errmsg);
+  //sqlite_check(res, errmsg);
 }
 
 int DataBaseWorker::sqlite_check(int code, const char *msg, int expected)
@@ -56,8 +57,8 @@ int DataBaseWorker::sqlite_check(int code, const char *msg, int expected)
 
 void DataBaseWorker::sqlite_throw(int code, const char *msg)
 {
-  throw std::runtime_error{
-      std::format("SQL Method failed: {} {}", sqlite3_errstr(code), msg)};
+  std::cout<<"SQL Method failed"<< sqlite3_errstr(code)<< msg;
+  std::abort();
 }
 
 void DataBaseWorker::start_db()
@@ -71,8 +72,8 @@ void DataBaseWorker::start_db()
     if (sqlite3_prepare_v2(db, sql.data(), sql.size(), &create_table_stmt,
                            &stmt_tail) != SQLITE_OK)
     {
-      std::cerr << std::format("Error preparing statement: {}",
-                               sqlite3_errmsg(db))
+      std::cerr << "Error preparing statement: "<<
+                               sqlite3_errmsg(db)
                 << "\n";
     }
 
@@ -103,8 +104,8 @@ void DataBaseWorker::start_db()
   if (sqlite3_prepare_v2(db, sqlb.data(), sqlb.size(), &create_table_stmt2,
                          &stmt_tailb) != SQLITE_OK)
   {
-    std::cerr << std::format("Error preparing statement: {}",
-                             sqlite3_errmsg(db))
+    std::cerr << "Error preparing statement: {}"<<
+                             sqlite3_errmsg(db)
               << "\n";
   }
 
@@ -127,5 +128,5 @@ void DataBaseWorker::start_db()
 
   sqlite_check(sqlite3_finalize(create_table_stmt2));
 
-  std::format("Data Base Open");
+  std::cout<<"Data Base Open \n";
 }
