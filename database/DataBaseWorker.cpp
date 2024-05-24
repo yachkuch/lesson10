@@ -25,7 +25,7 @@ void DataBaseWorker::operator()(std::string data)
     }
     else if(val == "B")
     {
-      add_mes();
+      add_mes(create_table_stmt,"B",lines);
     }
   }
 }
