@@ -2,9 +2,11 @@
 #include "DataBaseWorker.h"
 #include <cstdio>
 #include <boost/asio/io_context.hpp>
+#include <iostream>
 //#include <process.h>
 int main() 
 {
+    //TODO: Добавить отправку текстового сообщения с ошибкой или сообщения ок 
     boost::asio::io_context context; 
     Networker net(context,1337,"127.0.0.1");
     DataBaseWorker dbw;
@@ -12,9 +14,4 @@ int main()
     net.start_server();
     dbw.start_db();
     context.run();
-    //  net.sig("INSERT A 1 l");
-    //  net.sig("INSERT B 2 sweet");
-    // net.sig("INSERT B 1 lean");
-    // net.sig("INSERTB 3 SWTT");
-    
 }

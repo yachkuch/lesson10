@@ -5,7 +5,6 @@
 #include <boost/asio/io_context.hpp>
 #include <boost/asio/ip/address_v4.hpp>
 #include <boost/bind.hpp>
-// #include <boost/system/detail/error_code.hpp>
 #include <boost/system/error_code.hpp>
 #include <cstddef>
 #include <cstdlib>
@@ -33,19 +32,10 @@ void Session::run() {
           std::cout << "Parapapa \n";
           std::abort();
         }
-        for (bool flag = false; const auto &el : buff) {
-          if (!flag) {
-            if (el == '\n') {
-              net.sendData(std::move(recieve_string));
-              flag = true;
-              if (recieve_string.size() == bytes)
-                return;
-            }
-            recieve_string.push_back(el);
-          } else {
-            unused_bytes_ref.get().push_back(el);
-          }
+        for (int i =0; i<bytes -1; i++) {
+          recieve_string.push_back(buff.at(i));
         }
+        net.sendData(std::move(recieve_string));
         self->run();
       });
 }
@@ -69,13 +59,21 @@ void Networker::start_server() {
   std::cout << "Server start \n";
 }
 
-void Networker::sendData(std::string data) { sig(data); }
+void Networker::sendData(std::string data) {
+   auto a = sig(data);
+   pSocket.get()->send(boost::asio::buffer(a.get()));
+    }
 
 void Networker::handleAccept(
     std::shared_ptr<boost::asio::ip::tcp::socket> socket) {
   std::cout << "New connection" << std::endl;
   auto ses = std::make_shared<Session>(context, std::move(socket), *this);
   ses->run();
+}
+
+void Networker::operator()(std::string string)
+{
+  
 }
 
 Networker::~Networker() {}

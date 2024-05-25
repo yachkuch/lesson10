@@ -31,15 +31,13 @@ public:
   explicit Networker(boost::asio::io_context &con, unsigned int port,
                      std::string ip_adress = "");
   virtual ~Networker();
-  Networker(const Networker &other) = delete;
-  Networker(Networker &&other) = delete;
-  Networker &operator=(const Networker &other) = delete;
-  Networker &operator=(Networker &&other) = delete;
 
   void start_server();
 
   void sendData(std::string data);
-  boost::signals2::signal<void(std::string string)> sig;
+
+  void operator()(std::string string);
+  boost::signals2::signal<std::string(std::string string)> sig;
 
 private:
 

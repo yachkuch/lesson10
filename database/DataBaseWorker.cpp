@@ -11,26 +11,27 @@ DataBaseWorker::~DataBaseWorker()
   sqlite_check(sqlite3_close(db));
 }
 
-void DataBaseWorker::operator()(std::string data) 
+std::string DataBaseWorker::operator()(std::string data) 
 {
-  std::cout<<data<<std::endl;
   std::vector<std::string> lines;
   boost::split(lines, data, boost::algorithm::is_space());
+  std::string result;
   if(!lines.empty() && (lines.size() == 4))
   {
     auto val = lines.at(1);
     if(val == "A")
     {
-      add_mes(create_table_stmt,"A",lines);
+      result = add_mes(create_table_stmt,"A",lines);
     }
     else if(val == "B")
     {
-      add_mes(create_table_stmt,"B",lines);
+      result = add_mes(create_table_stmt,"B",lines);
     }
   }
+  return result;
 }
 
-void DataBaseWorker::add_mes( sqlite3_stmt  *stmt,std::string db_name,
+std::string DataBaseWorker::add_mes( sqlite3_stmt  *stmt,std::string db_name,
  const std::vector<std::string>&mes)
 {
   sqlite_check(sqlite3_open("db", &db));
@@ -45,7 +46,11 @@ void DataBaseWorker::add_mes( sqlite3_stmt  *stmt,std::string db_name,
   sql.append("');");
   int res = sqlite3_exec(db, sql.data(),
                      nullptr, nullptr, &errmsg);
-  sqlite_check(res, errmsg);
+  if(res != SQLITE_OK)
+  {
+    return std::string(errmsg);
+  }
+  return "OK";
 }
 
 int DataBaseWorker::sqlite_check(int code, const char *msg, int expected)
@@ -61,6 +66,17 @@ void DataBaseWorker::sqlite_throw(int code, const char *msg)
 {
   std::cout<<"SQL Method failed"<< sqlite3_errstr(code)<< msg;
   std::abort();
+}
+
+void DataBaseWorker::sqlite_check_with_mes(int code, const char* msg, int expected)
+{
+  std::string result_str(msg);
+  if (code == expected)
+  {
+    result_str.clear();
+    result_str.append("OK");
+  }
+  //result(result_str);
 }
 
 void DataBaseWorker::start_db()

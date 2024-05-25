@@ -3,16 +3,20 @@
 #include <boost/signals2.hpp>
 #include <sqlite3.h>
 #include <vector>
+#include <string>
 ///////////////////////////////////////////////////////////
 /// @brief DataBaseWorker
 ///
-class DataBaseWorker
+class DataBaseWorker  final
 {
 public:
     DataBaseWorker();
     virtual ~DataBaseWorker();
+
     void start_db();
-    void operator()(std::string str);
+    std::string operator()(std::string str);
+
+    
 private:
     /// @brief Указатель на бд 
     sqlite3* db = nullptr;
@@ -20,10 +24,11 @@ private:
     sqlite3_stmt* create_table_stmt = nullptr;
     sqlite3_stmt* create_table_stmt2 = nullptr;
 
-    void add_mes( sqlite3_stmt  *stmt, std::string db_name, const std::vector<std::string>&mes );
+    std::string add_mes( sqlite3_stmt  *stmt, std::string db_name, const std::vector<std::string>&mes );
 
     int sqlite_check(int code, const char* msg = "", int expected = SQLITE_OK);
     void sqlite_throw(int code, const char* msg = "");
+    void sqlite_check_with_mes(int code, const char* msg = "", int expected = SQLITE_OK);
 
 };
 
