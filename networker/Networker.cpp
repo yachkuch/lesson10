@@ -35,7 +35,7 @@ void Session::run() {
         for (int i =0; i<bytes -1; i++) {
           recieve_string.push_back(buff.at(i));
         }
-        net.sendData(std::move(recieve_string));
+        net.sendData(std::move(recieve_string),socket);
         self->run();
       });
 }
@@ -52,14 +52,16 @@ void Networker::start_server() {
 
   asio::ip::tcp::endpoint endpoint(asio::ip::make_address_v4(ip_), port_);
   acceptor = new asio::ip::tcp::acceptor{context, endpoint};
-  pSocket =
+  auto Socket =
       std::make_shared<asio::ip::tcp::socket>(asio::ip::tcp::socket(context));
-  acceptor->async_accept(*pSocket,
-                         boost::bind(&Networker::handleAccept, this, pSocket));
+      // pSocket.push_back(Socket);
+  acceptor->async_accept(*Socket,
+                         boost::bind(&Networker::handleAccept, this, Socket));
   std::cout << "Server start \n";
 }
 
-void Networker::sendData(std::string data) {
+void Networker::sendData(std::string data,std::shared_ptr<boost::asio::ip::tcp::socket> pSocket)
+ {
    auto a = sig(data);
    pSocket.get()->send(boost::asio::buffer(a.get()));
     }
@@ -69,6 +71,13 @@ void Networker::handleAccept(
   std::cout << "New connection" << std::endl;
   auto ses = std::make_shared<Session>(context, std::move(socket), *this);
   ses->run();
+  createAcceptor();
+}
+
+void Networker::createAcceptor()
+{
+    acceptor->async_accept(*pSocket,
+                         boost::bind(&Networker::handleAccept, this, pSocket));
 }
 
 void Networker::operator()(std::string string)

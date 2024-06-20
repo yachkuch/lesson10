@@ -34,7 +34,7 @@ public:
 
   void start_server();
 
-  void sendData(std::string data);
+  void sendData(std::string data,std::shared_ptr<boost::asio::ip::tcp::socket> pSocket);
 
   void operator()(std::string string);
   boost::signals2::signal<std::string(std::string string)> sig;
@@ -42,11 +42,12 @@ public:
 private:
 
   void handleAccept(std::shared_ptr<boost::asio::ip::tcp::socket> socket);
+  void createAcceptor();
   unsigned int port_ = 0;
   std::vector<char> unusedBytes;
   std::string ip_ = "127.0.0.1";
   boost::asio::ip::tcp::acceptor *acceptor = nullptr;
-  std::shared_ptr<boost::asio::ip::tcp::socket> pSocket;
+ std::shared_ptr<boost::asio::ip::tcp::socket> pSocket;
   boost::asio::io_context &context;
 };
 
